@@ -1,0 +1,20 @@
+services:
+  # Наш первый сервис - База Данных
+  db:
+    image: postgres:16-alpine
+    container_name: shop-db
+    environment:
+      POSTGRES_USER: shop_user
+      POSTGRES_PASSWORD: superpassword
+      POSTGRES_DB: autoparts_db
+    ports:
+      - "5432:5432" # Стандартный порт PostgreSQL
+
+  # Наш второй сервис - Бэкенд (API)
+  api:
+    build: . # Указываем, что образ нужно собрать из нашего Dockerfile в этой папке
+    container_name: shop-api
+    ports:
+      - "8080:8080" # Проброс порта для доступа из браузера
+    depends_on:
+      - db # Говорим Докеру: не запускай API, пока не запустишь базу данных
