@@ -1,5 +1,4 @@
 services:
-  # Наш первый сервис - База Данных
   db:
     image: postgres:16-alpine
     container_name: shop-db
@@ -8,13 +7,22 @@ services:
       POSTGRES_PASSWORD: superpassword
       POSTGRES_DB: autoparts_db
     ports:
-      - "5432:5432" # Стандартный порт PostgreSQL
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
 
-  # Наш второй сервис - Бэкенд (API)
   api:
-    build: . # Указываем, что образ нужно собрать из нашего Dockerfile в этой папке
+    build: .
     container_name: shop-api
+    environment: # Добавили переменные для API!
+      - DB_HOST=db # Имя хоста совпадает с названием сервиса базы данных
+      - DB_USER=shop_user
+      - DB_PASSWORD=superpassword
+      - DB_NAME=autoparts_db
     ports:
-      - "8080:8080" # Проброс порта для доступа из браузера
+      - "8080:8080"
     depends_on:
-      - db # Говорим Докеру: не запускай API, пока не запустишь базу данных
+      - db
+    
+volumes:
+  pg_data:
