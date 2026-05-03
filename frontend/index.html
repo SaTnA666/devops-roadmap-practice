@@ -3,9 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <title>AutoParts Store</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f9; }
+        .card { background: white; padding: 15px; margin-bottom: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    </style>
 </head>
 <body>
-    <h1>Добро пожаловать в магазин Автозапчастей!</h1>
-    <p>Здесь скоро появится каталог товаров, который будет подтягиваться из нашего API.</p>
+    <h1>Каталог Автозапчастей 🚗</h1>
+    <div id="parts-container">Загрузка данных...</div>
+
+    <script>
+        // JS делает запрос к API (заметь, мы не пишем localhost:8080, мы обращаемся к корню сайта!)
+        fetch('/api/parts')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('parts-container');
+                container.innerHTML = ''; // Очищаем текст загрузки
+                
+                data.forEach(part => {
+                    const div = document.createElement('div');
+                    div.className = 'card';
+                    div.innerHTML = `<strong>${part.name}</strong> <br> Подходит для: ${part.car} <br> Цена: ${part.price} руб.`;
+                    container.appendChild(div);
+                });
+            })
+            .catch(error => {
+                document.getElementById('parts-container').innerHTML = 'Ошибка загрузки данных :(';
+            });
+    </script>
 </body>
 </html>

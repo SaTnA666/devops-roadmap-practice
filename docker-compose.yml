@@ -6,23 +6,34 @@ services:
       POSTGRES_USER: shop_user
       POSTGRES_PASSWORD: superpassword
       POSTGRES_DB: autoparts_db
-    ports:
-      - "5432:5432"
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql/data 
 
   api:
     build: .
     container_name: shop-api
-    environment: # Добавили переменные для API!
-      - DB_HOST=db # Имя хоста совпадает с названием сервиса базы данных
+    environment:
+      - DB_HOST=db
       - DB_USER=shop_user
       - DB_PASSWORD=superpassword
       - DB_NAME=autoparts_db
-    ports:
-      - "8080:8080"
+    # ВАЖНО: Мы удалили блок ports! Теперь 8080 недоступен с твоего Дебиана.
     depends_on:
       - db
-    
+
+  # ДОБАВЛЯЕМ МЕТРДОТЕЛЯ
+  nginx:
+    image: nginx:alpine # Берем готовый легкий образ
+    container_name: shop-nginx
+    ports:
+      - "80:80" # Открываем наружу только стандартный 80-й порт
+    volumes:
+      # Прокидываем папку с фронтендом
+      - ./frontend:/usr/share/nginx/html
+      # Прокидываем наш файл настроек (заменяя стандартный внутри контейнера)
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - api # Запускать только после того, как запустится API
+
 volumes:
   pg_data:
